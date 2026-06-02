@@ -1,0 +1,17 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.idea/
+*.iml
+*.iws
+*.ipr
+.settings/
+.project
+.classpath
+.springBeans
+.sts4-cache/
+bin/
+.vscode/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
