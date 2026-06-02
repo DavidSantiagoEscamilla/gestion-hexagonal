@@ -1,0 +1,173 @@
+{
+  "info": {
+    "name": "Gestion Hexagonal - API RESTful",
+    "description": "Coleccion de pruebas para la API con arquitectura hexagonal. Incluye Login, CRUDL de Usuarios y CRUDL de Empleos. El token JWT se guarda automaticamente tras el login.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "cedula", "value": "1001", "type": "string" },
+    { "key": "empleoId", "value": "1", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "POST - Crear usuario",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/usuarios", "host": ["{{baseUrl}}"], "path": ["api", "usuarios"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cedula\": \"1001\",\n  \"clave\": \"Abc123*\",\n  \"nombre\": \"David Escamilla\",\n  \"email\": \"david@unicartagena.edu.co\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST - Login usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Guarda el token devuelto en la variable de coleccion para reusarlo",
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "  console.log('Token guardado correctamente');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cedula\": \"1001\",\n  \"clave\": \"Abc123*\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET - Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/usuarios", "host": ["{{baseUrl}}"], "path": ["api", "usuarios"] }
+          }
+        },
+        {
+          "name": "GET - Obtener usuario",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/usuarios/{{cedula}}", "host": ["{{baseUrl}}"], "path": ["api", "usuarios", "{{cedula}}"] }
+          }
+        },
+        {
+          "name": "PUT - Actualizar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/usuarios/{{cedula}}", "host": ["{{baseUrl}}"], "path": ["api", "usuarios", "{{cedula}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"David Santiago Escamilla\",\n  \"email\": \"david.nuevo@unicartagena.edu.co\",\n  \"clave\": \"\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE - Eliminar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/usuarios/{{cedula}}", "host": ["{{baseUrl}}"], "path": ["api", "usuarios", "{{cedula}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Empleos",
+      "item": [
+        {
+          "name": "POST - Crear empleo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('empleoId', json.id);",
+                  "  console.log('empleoId guardado: ' + json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/empleos", "host": ["{{baseUrl}}"], "path": ["api", "empleos"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Desarrollador Backend\",\n  \"categoria\": \"Tecnologia\",\n  \"areaTrabajo\": \"Ingenieria de Software\",\n  \"empresa\": \"TechCorp\",\n  \"nivel\": \"Senior\",\n  \"sueldo\": 6500000,\n  \"funciones\": \"Disenar y mantener APIs REST, revisar codigo, mentoria\",\n  \"cargoJefe\": \"Líder de Tecnología\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET - Listar empleos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/empleos", "host": ["{{baseUrl}}"], "path": ["api", "empleos"] }
+          }
+        },
+        {
+          "name": "GET - Obtener empleo",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/empleos/{{empleoId}}", "host": ["{{baseUrl}}"], "path": ["api", "empleos", "{{empleoId}}"] }
+          }
+        },
+        {
+          "name": "PUT - Actualizar empleo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/empleos/{{empleoId}}", "host": ["{{baseUrl}}"], "path": ["api", "empleos", "{{empleoId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Desarrollador Backend Senior\",\n  \"categoria\": \"Tecnologia\",\n  \"areaTrabajo\": \"Ingenieria de Software\",\n  \"empresa\": \"TechCorp\",\n  \"nivel\": \"Lider\",\n  \"sueldo\": 8000000,\n  \"funciones\": \"Liderar el equipo de backend y definir arquitectura\",\n  \"cargoJefe\": \"CTO\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE - Eliminar empleo",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/empleos/{{empleoId}}", "host": ["{{baseUrl}}"], "path": ["api", "empleos", "{{empleoId}}"] }
+          }
+        }
+      ]
+    }
+  ]
+}
