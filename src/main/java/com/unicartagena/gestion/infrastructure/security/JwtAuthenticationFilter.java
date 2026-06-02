@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * Filtro que se ejecuta una vez por peticion: extrae el token JWT del header
  * Authorization, lo valida y, si es correcto, autentica al usuario en el contexto.
+ * No se ejecuta en las rutas publicas (login y creacion de usuario).
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -24,6 +25,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    /**
+     * Las rutas publicas no pasan por la logica del filtro:
+     * - POST /api/auth/login
+     * - POST /api/usuarios (registro)
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        String method = request.getMethod();
+
+        if (path.startsWith("/api/auth/")) {
+            return true;
+        }
+        if ("POST".equalsIgnoreCase(method) && "/api/usuarios".equals(path)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
